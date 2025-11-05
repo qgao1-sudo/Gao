@@ -1,28 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello</title>
+    <title>游戏主界面</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            padding: 20px;
         }
-        img {
-            max-width: 90%;
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-cover {
+            width: 100%;
+            max-width: 600px;
             height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .game-cover:hover {
+            transform: scale(1.02);
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             margin-top: 20px;
+        }
+
+        .menu-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            font-weight: bold;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .menu-button:active {
+            transform: translateY(-1px);
+        }
+
+        .menu-button:nth-child(2) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .menu-button:nth-child(2):hover {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+        }
+
+        .menu-button:nth-child(3) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .menu-button:nth-child(3):hover {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
+        }
+
+        .menu-button:nth-child(4) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .menu-button:nth-child(4):hover {
+            background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.6);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .game-container {
+                padding: 20px;
+            }
+
+            .menu-button {
+                font-size: 1em;
+                padding: 15px 30px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>人选玉大王的网站</h1>
-    <img src="Friends taking selfie.png" alt="Friends taking selfie">
+    <div class="game-container">
+        <h1>🎮 游戏主界面</h1>
+        <img src="Friends taking selfie.png" alt="游戏封面" class="game-cover">
+
+        <div class="menu-options">
+            <button class="menu-button" onclick="startGame()">🚀 开始游戏</button>
+            <button class="menu-button" onclick="loadGame()">💾 继续游戏</button>
+            <button class="menu-button" onclick="showSettings()">⚙️ 游戏设置</button>
+            <button class="menu-button" onclick="showAbout()">ℹ️ 关于游戏</button>
+        </div>
+    </div>
+
+    <script>
+        function startGame() {
+            alert('🎮 开始新游戏！\n准备好开始你的冒险了吗？');
+            console.log('开始新游戏');
+        }
+
+        function loadGame() {
+            alert('💾 继续游戏\n加载上次保存的进度...');
+            console.log('继续游戏');
+        }
+
+        function showSettings() {
+            alert('⚙️ 游戏设置\n在这里可以调整音量、画质等设置');
+            console.log('打开设置');
+        }
+
+        function showAbout() {
+            alert('ℹ️ 关于游戏\n\n欢迎来到这个精彩的游戏世界！\n版本：1.0\n制作：人选玉大王');
+            console.log('显示关于信息');
+        }
+    </script>
 </body>
 </html>
