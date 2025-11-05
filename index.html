@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DARK CURRENT - 游戏主界面</title>
+    <title>DARK CURRENT</title>
     <style>
         * {
             margin: 0;
@@ -11,123 +11,111 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            min-height: 100vh;
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 全屏游戏封面背景 */
+        .game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('游戏封面.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* 按钮区域容器 - 位于屏幕底部 */
+        .button-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            overflow: hidden;
-        }
-
-        .game-wrapper {
-            position: relative;
-            max-width: 900px;
-            width: 100%;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .game-cover {
-            width: 100%;
-            height: auto;
-            display: block;
-            user-select: none;
-        }
-
-        /* 可点击按钮区域容器 */
-        .button-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20%;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 5%;
+            gap: 2%;
+            padding: 0 8%;
         }
 
         /* 每个按钮的可点击区域 */
-        .game-btn {
+        .game-button {
             flex: 1;
-            height: 100%;
+            height: 60%;
             cursor: pointer;
             position: relative;
-            transition: all 0.3s ease;
-            margin: 0 2%;
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
 
-        .game-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 255, 255, 0);
-            transition: all 0.3s ease;
-            border-radius: 5px;
+        /* 按钮悬停效果 */
+        .game-button:hover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+            transform: translateY(-3px);
         }
 
-        .game-btn:hover::before {
-            background: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        .game-button:active {
+            background: rgba(0, 255, 255, 0.3);
+            transform: translateY(-1px);
         }
 
-        .game-btn:active::before {
-            background: rgba(0, 255, 255, 0.4);
-            transform: scale(0.95);
-        }
-
-        /* 消息提示框 */
-        .message-overlay {
+        /* 消息弹窗 */
+        .message-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 20, 40, 0.95);
-            border: 2px solid #00ffff;
-            border-radius: 15px;
-            padding: 40px 60px;
+            background: rgba(5, 15, 30, 0.98);
+            border: 3px solid #00ffff;
+            border-radius: 20px;
+            padding: 50px 70px;
             color: #00ffff;
-            font-size: 1.5em;
+            font-size: 1.8em;
             text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8),
+                        inset 0 0 30px rgba(0, 255, 255, 0.1);
             display: none;
-            z-index: 1000;
-            min-width: 300px;
+            z-index: 2000;
+            min-width: 400px;
+            font-family: 'Arial', sans-serif;
+            white-space: pre-line;
         }
 
-        .message-overlay.show {
+        .message-popup.show {
             display: block;
-            animation: messagePopup 0.5s ease;
+            animation: popupAppear 0.4s ease;
         }
 
-        .message-overlay .close-btn {
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+        .message-popup .close-button {
+            margin-top: 30px;
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #00ffff 0%, #0099ff 100%);
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             color: #000;
             font-weight: bold;
+            font-size: 0.6em;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
         }
 
-        .message-overlay .close-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        .message-popup .close-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 1);
         }
 
-        @keyframes messagePopup {
+        @keyframes popupAppear {
             from {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
+                transform: translate(-50%, -50%) scale(0.7);
             }
             to {
                 opacity: 1;
@@ -137,42 +125,35 @@
 
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .message-overlay {
-                padding: 30px 40px;
-                font-size: 1.2em;
-                min-width: 250px;
+            .button-container {
+                height: 12%;
+                padding: 0 5%;
             }
-        }
 
-        /* 添加闪烁效果 */
-        @keyframes glow {
-            0%, 100% {
-                box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            .message-popup {
+                padding: 35px 45px;
+                font-size: 1.3em;
+                min-width: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="game-wrapper">
-        <!-- 游戏封面图片 -->
-        <img src="游戏封面.png" alt="DARK CURRENT Game Cover" class="game-cover">
-
-        <!-- 可点击按钮覆盖层 -->
-        <div class="button-overlay">
-            <div class="game-btn" onclick="startGame()" title="START GAME"></div>
-            <div class="game-btn" onclick="loadGame()" title="LOAD GAME"></div>
-            <div class="game-btn" onclick="showSettings()" title="SETTINGS"></div>
-            <div class="game-btn" onclick="quitGame()" title="QUIT"></div>
+    <!-- 全屏游戏封面 -->
+    <div class="game-screen">
+        <!-- 透明按钮覆盖层 -->
+        <div class="button-container">
+            <div class="game-button" onclick="startGame()" title="START GAME"></div>
+            <div class="game-button" onclick="loadGame()" title="LOAD GAME"></div>
+            <div class="game-button" onclick="showSettings()" title="SETTINGS"></div>
+            <div class="game-button" onclick="quitGame()" title="QUIT"></div>
         </div>
     </div>
 
-    <!-- 消息提示框 -->
-    <div class="message-overlay" id="messageBox">
+    <!-- 消息弹窗 -->
+    <div class="message-popup" id="messageBox">
         <div id="messageText"></div>
-        <button class="close-btn" onclick="closeMessage()">确定</button>
+        <button class="close-button" onclick="closeMessage()">OK</button>
     </div>
 
     <script>
@@ -189,33 +170,33 @@
         }
 
         function startGame() {
-            showMessage('🎮 START GAME\n\n游戏正在启动中...\n准备进入 DARK CURRENT 的世界！');
+            showMessage('START GAME\n\n游戏启动中...\n欢迎来到 DARK CURRENT 的世界');
             console.log('START GAME clicked');
         }
 
         function loadGame() {
-            showMessage('💾 LOAD GAME\n\n正在加载已保存的游戏进度...');
+            showMessage('LOAD GAME\n\n加载存档中...');
             console.log('LOAD GAME clicked');
         }
 
         function showSettings() {
-            showMessage('⚙️ SETTINGS\n\n设置菜单\n音量、画质、控制等选项');
+            showMessage('SETTINGS\n\n设置面板\n音量 | 画质 | 控制');
             console.log('SETTINGS clicked');
         }
 
         function quitGame() {
-            if (confirm('确定要退出 DARK CURRENT 吗？')) {
-                showMessage('👋 QUIT\n\n感谢游玩！\n期待您的再次光临！');
+            if (confirm('确定要退出游戏吗？')) {
+                showMessage('QUIT\n\n感谢游玩！');
                 console.log('QUIT clicked');
             }
         }
 
-        // 键盘快捷键支持
+        // 键盘快捷键
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 startGame();
             } else if (event.key === 'Escape') {
-                quitGame();
+                closeMessage();
             } else if (event.key === 's' || event.key === 'S') {
                 showSettings();
             } else if (event.key === 'l' || event.key === 'L') {
@@ -223,7 +204,7 @@
             }
         });
 
-        // 点击消息框外部关闭
+        // 点击弹窗外部关闭
         document.getElementById('messageBox').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeMessage();
