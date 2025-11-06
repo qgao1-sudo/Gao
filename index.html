@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游戏主界面</title>
+    <title>DARK CURRENT</title>
     <style>
         * {
             margin: 0;
@@ -11,222 +11,203 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 全屏游戏封面背景 */
+        .game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('游戏封面.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* 按钮区域容器 - 位于屏幕底部 */
+        .button-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            gap: 2%;
+            padding: 0 8%;
         }
 
-        .game-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 800px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .game-cover {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .game-cover:hover {
-            transform: scale(1.02);
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .menu-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .menu-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 1.2em;
-            border-radius: 50px;
+        /* 每个按钮的可点击区域 */
+        .game-button {
+            flex: 1;
+            height: 60%;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            position: relative;
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
 
-        .menu-button:hover {
+        /* 按钮悬停效果 */
+        .game-button:hover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
 
-        .menu-button:active {
+        .game-button:active {
+            background: rgba(0, 255, 255, 0.3);
             transform: translateY(-1px);
         }
 
-        .menu-button.secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
-        }
-
-        .menu-button.secondary:hover {
-            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
-        }
-
-        .menu-button.tertiary {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        .menu-button.tertiary:hover {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
-        }
-
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            color: #333;
-            font-size: 1.1em;
+        /* 消息弹窗 */
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 15, 30, 0.98);
+            border: 3px solid #00ffff;
+            border-radius: 20px;
+            padding: 50px 70px;
+            color: #00ffff;
+            font-size: 1.8em;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8),
+                        inset 0 0 30px rgba(0, 255, 255, 0.1);
             display: none;
+            z-index: 2000;
+            min-width: 400px;
+            font-family: 'Arial', sans-serif;
+            white-space: pre-line;
         }
 
-        .message.show {
+        .message-popup.show {
             display: block;
-            animation: fadeIn 0.5s ease;
+            animation: popupAppear 0.4s ease;
         }
 
-        @keyframes fadeIn {
+        .message-popup .close-button {
+            margin-top: 30px;
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #00ffff 0%, #0099ff 100%);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-weight: bold;
+            font-size: 0.6em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .message-popup .close-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 1);
+        }
+
+        @keyframes popupAppear {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translate(-50%, -50%) scale(0.7);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translate(-50%, -50%) scale(1);
             }
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8em;
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .button-container {
+                height: 12%;
+                padding: 0 5%;
             }
 
-            .menu-button {
-                font-size: 1em;
-                padding: 15px 30px;
+            .message-popup {
+                padding: 35px 45px;
+                font-size: 1.3em;
+                min-width: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>游戏主界面</h1>
-
-        <!-- 游戏封面图片 -->
-        <img src="游戏封面.png"
-             alt="游戏封面"
-             class="game-cover"
-             onerror="this.src='Friends taking selfie.png'">
-
-        <!-- 菜单选项 -->
-        <div class="menu-options">
-            <button class="menu-button" onclick="startGame()">
-                🎮 开始游戏
-            </button>
-
-            <button class="menu-button secondary" onclick="showSettings()">
-                ⚙️ 游戏设置
-            </button>
-
-            <button class="menu-button tertiary" onclick="showAbout()">
-                ℹ️ 关于游戏
-            </button>
-
-            <button class="menu-button" onclick="viewRecords()">
-                🏆 游戏记录
-            </button>
-
-            <button class="menu-button secondary" onclick="exitGame()">
-                🚪 退出游戏
-            </button>
+    <!-- 全屏游戏封面 -->
+    <div class="game-screen">
+        <!-- 透明按钮覆盖层 -->
+        <div class="button-container">
+            <div class="game-button" onclick="startGame()" title="START GAME"></div>
+            <div class="game-button" onclick="loadGame()" title="LOAD GAME"></div>
+            <div class="game-button" onclick="showSettings()" title="SETTINGS"></div>
+            <div class="game-button" onclick="quitGame()" title="QUIT"></div>
         </div>
+    </div>
 
-        <div class="message" id="message"></div>
+    <!-- 消息弹窗 -->
+    <div class="message-popup" id="messageBox">
+        <div id="messageText"></div>
+        <button class="close-button" onclick="closeMessage()">OK</button>
     </div>
 
     <script>
         function showMessage(text) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.classList.add('show');
-            setTimeout(() => {
-                messageDiv.classList.remove('show');
-            }, 3000);
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            messageText.textContent = text;
+            messageBox.classList.add('show');
+        }
+
+        function closeMessage() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.classList.remove('show');
         }
 
         function startGame() {
-            showMessage('🎮 正在启动游戏...');
-            // 在这里添加开始游戏的逻辑
-            console.log('开始游戏');
+            showMessage('START GAME\n\n游戏启动中...\n欢迎来到 DARK CURRENT 的世界');
+            console.log('START GAME clicked');
+        }
+
+        function loadGame() {
+            showMessage('LOAD GAME\n\n加载存档中...');
+            console.log('LOAD GAME clicked');
         }
 
         function showSettings() {
-            showMessage('⚙️ 打开设置界面...');
-            // 在这里添加设置界面的逻辑
-            console.log('显示设置');
+            showMessage('SETTINGS\n\n设置面板\n音量 | 画质 | 控制');
+            console.log('SETTINGS clicked');
         }
 
-        function showAbout() {
-            showMessage('ℹ️ 这是一个精彩的游戏！');
-            // 在这里添加关于页面的逻辑
-            console.log('关于游戏');
-        }
-
-        function viewRecords() {
-            showMessage('🏆 查看游戏记录...');
-            // 在这里添加记录查看的逻辑
-            console.log('查看记录');
-        }
-
-        function exitGame() {
+        function quitGame() {
             if (confirm('确定要退出游戏吗？')) {
-                showMessage('👋 感谢游玩，再见！');
-                // 在这里添加退出逻辑
-                console.log('退出游戏');
+                showMessage('QUIT\n\n感谢游玩！');
+                console.log('QUIT clicked');
             }
         }
 
-        // 添加键盘支持
+        // 键盘快捷键
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' || event.key === ' ') {
                 startGame();
             } else if (event.key === 'Escape') {
-                exitGame();
+                closeMessage();
+            } else if (event.key === 's' || event.key === 'S') {
+                showSettings();
+            } else if (event.key === 'l' || event.key === 'L') {
+                loadGame();
+            }
+        });
+
+        // 点击弹窗外部关闭
+        document.getElementById('messageBox').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessage();
             }
         });
     </script>
