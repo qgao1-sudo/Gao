@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生态平衡管理员 - 自然保护区模拟游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* 季节和资源面板 */
+        .top-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .season-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        .season-name {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .season-info {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .resource-panel {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .resource-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+
+        /* 生态指标面板 */
+        .indicators-panel {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .indicators-title {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .indicator {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .indicator-name {
+            font-size: 0.9em;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .indicator-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .indicator-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .indicator-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* 操作面板 */
+        .actions-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 3px solid transparent;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-card.planting { border-color: #48bb78; }
+        .action-card.breeding { border-color: #ed8936; }
+        .action-card.water { border-color: #4299e1; }
+        .action-card.forest { border-color: #38a169; }
+        .action-card.pollution { border-color: #9f7aea; }
+
+        .action-icon {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .action-desc {
+            font-size: 0.9em;
+            color: #718096;
+            margin-bottom: 15px;
+            text-align: center;
+            min-height: 40px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn.planting { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .action-btn.breeding { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+        .action-btn.water { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
+        .action-btn.forest { background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); }
+        .action-btn.pollution { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); }
+
+        /* 控制按钮 */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-season-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* 日志面板 */
+        .log-panel {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #90cdf4;
+        }
+
+        .log-entry {
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #4299e1;
+        }
+
+        .log-time {
+            color: #90cdf4;
+            font-size: 0.9em;
+        }
+
+        /* 游戏结束面板 */
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .game-over-title {
+            font-size: 2.5em;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .game-over-score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .game-over-message {
+            font-size: 1.2em;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .actions-panel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .indicators-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .actions-panel {
+                grid-template-columns: 1fr;
+            }
+            .indicators-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .top-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🌱 生态平衡管理员 🌱</h1>
+        <div class="subtitle">自然保护区生态模拟游戏 - 你的每个决策都影响生态未来</div>
+
+        <!-- 季节和资源显示 -->
+        <div class="top-panel">
+            <div class="season-display">
+                <div class="season-name" id="seasonName">春季</div>
+                <div class="season-info" id="seasonInfo">万物复苏，生机勃勃</div>
+                <div style="margin-top: 10px; font-size: 1.2em;">
+                    第 <span id="yearCount">1</span> 年 | 第 <span id="seasonCount">1</span> 季
+                </div>
+            </div>
+
+            <div class="resource-panel">
+                <div class="resource-item">
+                    <span>💰 资金</span>
+                    <span id="money">1000</span>
+                </div>
+                <div class="resource-item">
+                    <span>🌾 粮食</span>
+                    <span id="food">100</span>
+                </div>
+                <div class="resource-item">
+                    <span>🔬 科技点</span>
+                    <span id="tech">50</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 生态指标 -->
+        <div class="indicators-panel">
+            <div class="indicators-title">🌍 生态平衡指标</div>
+            <div class="indicators-grid">
+                <div class="indicator">
+                    <div class="indicator-name">生物多样性</div>
+                    <div class="indicator-value" id="biodiversity">50</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="biodiversityBar" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-name">水质指数</div>
+                    <div class="indicator-value" id="waterQuality">50</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="waterQualityBar" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-name">土壤健康</div>
+                    <div class="indicator-value" id="soilHealth">50</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="soilHealthBar" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-name">空气质量</div>
+                    <div class="indicator-value" id="airQuality">50</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="airQualityBar" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="indicator">
+                    <div class="indicator-name">资源平衡</div>
+                    <div class="indicator-value" id="resourceBalance">50</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="resourceBalanceBar" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏操作 -->
+        <div class="actions-panel">
+            <!-- 种植作物 -->
+            <div class="action-card planting">
+                <div class="action-icon">🌾</div>
+                <div class="action-title">种植作物</div>
+                <div class="action-desc">种植有机作物，获取粮食，改善土壤</div>
+                <button class="action-btn planting" onclick="plantCrops()">种植 (-50💰)</button>
+            </div>
+
+            <!-- 养殖动物 -->
+            <div class="action-card breeding">
+                <div class="action-icon">🐄</div>
+                <div class="action-title">养殖动物</div>
+                <div class="action-desc">生态养殖，增加生物多样性</div>
+                <button class="action-btn breeding" onclick="breedAnimals()">养殖 (-80💰)</button>
+            </div>
+
+            <!-- 水资源管理 -->
+            <div class="action-card water">
+                <div class="action-icon">💧</div>
+                <div class="action-title">水资源管理</div>
+                <div class="action-desc">净化水源，建设灌溉系统</div>
+                <button class="action-btn water" onclick="manageWater()">管理 (-60💰)</button>
+            </div>
+
+            <!-- 森林保护 -->
+            <div class="action-card forest">
+                <div class="action-icon">🌲</div>
+                <div class="action-title">森林保护</div>
+                <div class="action-desc">植树造林，改善空气质量</div>
+                <button class="action-btn forest" onclick="protectForest()">植树 (-70💰)</button>
+            </div>
+
+            <!-- 污染控制 -->
+            <div class="action-card pollution">
+                <div class="action-icon">♻️</div>
+                <div class="action-title">污染控制</div>
+                <div class="action-desc">研发环保技术，减少污染</div>
+                <button class="action-btn pollution" onclick="controlPollution()">研发 (-100💰)</button>
+            </div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="control-panel">
+            <button class="control-btn next-season-btn" onclick="nextSeason()">⏭️ 进入下一季</button>
+            <button class="control-btn reset-btn" onclick="resetGame()">🔄 重新开始</button>
+        </div>
+
+        <!-- 游戏日志 -->
+        <div class="log-panel">
+            <div class="log-title">📋 管理日志</div>
+            <div id="gameLog"></div>
+        </div>
+    </div>
+
+    <!-- 游戏结束界面 -->
+    <div class="game-over" id="gameOver">
+        <div class="game-over-content">
+            <div class="game-over-title" id="gameOverTitle">游戏结束</div>
+            <div class="game-over-score" id="finalScore">0</div>
+            <div class="game-over-message" id="gameOverMessage"></div>
+            <button class="control-btn reset-btn" onclick="resetGame()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            year: 1,
+            season: 0, // 0=春, 1=夏, 2=秋, 3=冬
+            money: 1000,
+            food: 100,
+            tech: 50,
+            indicators: {
+                biodiversity: 50,
+                waterQuality: 50,
+                soilHealth: 50,
+                airQuality: 50,
+                resourceBalance: 50
+            },
+            seasonNames: ['春季', '夏季', '秋季', '冬季'],
+            seasonInfo: [
+                '万物复苏，生机勃勃',
+                '阳光充足，作物生长',
+                '收获季节，硕果累累',
+                '休养生息，储备资源'
+            ],
+            seasonIcons: ['🌸', '☀️', '🍂', '❄️']
+        };
+
+        // 初始化游戏
+        function initGame() {
+            updateDisplay();
+            addLog('🎮 游戏开始！欢迎来到生态平衡管理模拟游戏');
+            addLog('📖 你的目标是在保护区中维持生态平衡，让所有指标保持健康水平');
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            // 更新季节显示
+            document.getElementById('seasonName').textContent =
+                gameState.seasonIcons[gameState.season] + ' ' + gameState.seasonNames[gameState.season];
+            document.getElementById('seasonInfo').textContent = gameState.seasonInfo[gameState.season];
+            document.getElementById('yearCount').textContent = gameState.year;
+            document.getElementById('seasonCount').textContent = gameState.season + 1;
+
+            // 更新资源
+            document.getElementById('money').textContent = gameState.money;
+            document.getElementById('food').textContent = gameState.food;
+            document.getElementById('tech').textContent = gameState.tech;
+
+            // 更新指标
+            for (let key in gameState.indicators) {
+                let value = Math.max(0, Math.min(100, gameState.indicators[key]));
+                gameState.indicators[key] = value;
+
+                let element = document.getElementById(key);
+                let bar = document.getElementById(key + 'Bar');
+
+                element.textContent = Math.round(value);
+                bar.style.width = value + '%';
+
+                // 根据数值改变颜色
+                if (value >= 70) {
+                    bar.style.background = 'linear-gradient(90deg, #48bb78 0%, #38a169 100%)';
+                } else if (value >= 40) {
+                    bar.style.background = 'linear-gradient(90deg, #ecc94b 0%, #d69e2e 100%)';
+                } else {
+                    bar.style.background = 'linear-gradient(90deg, #f56565 0%, #e53e3e 100%)';
+                }
+            }
+
+            checkGameOver();
+        }
+
+        // 种植作物
+        function plantCrops() {
+            if (gameState.money < 50) {
+                addLog('❌ 资金不足，无法种植作物');
+                return;
+            }
+
+            gameState.money -= 50;
+
+            // 根据季节不同效果
+            let foodGain = gameState.season === 0 ? 40 : (gameState.season === 1 ? 60 : (gameState.season === 2 ? 80 : 20));
+            gameState.food += foodGain;
+
+            gameState.indicators.soilHealth += gameState.season === 0 ? 8 : 5;
+            gameState.indicators.resourceBalance += 3;
+            gameState.indicators.biodiversity += 2;
+            gameState.indicators.airQuality -= 2; // 轻微影响空气
+
+            addLog(`🌾 种植作物成功！获得 ${foodGain} 粮食，改善了土壤健康`);
+            updateDisplay();
+        }
+
+        // 养殖动物
+        function breedAnimals() {
+            if (gameState.money < 80) {
+                addLog('❌ 资金不足，无法养殖动物');
+                return;
+            }
+
+            if (gameState.food < 20) {
+                addLog('❌ 粮食不足，动物需要食物');
+                return;
+            }
+
+            gameState.money -= 80;
+            gameState.food -= 20;
+
+            gameState.indicators.biodiversity += 12;
+            gameState.indicators.resourceBalance += 5;
+            gameState.indicators.waterQuality -= 3;
+            gameState.indicators.soilHealth -= 2;
+
+            gameState.money += 40; // 动物产出
+            gameState.tech += 5;
+
+            addLog('🐄 养殖动物成功！大幅提升了生物多样性，获得了一些收益');
+            updateDisplay();
+        }
+
+        // 水资源管理
+        function manageWater() {
+            if (gameState.money < 60) {
+                addLog('❌ 资金不足，无法管理水资源');
+                return;
+            }
+
+            gameState.money -= 60;
+
+            gameState.indicators.waterQuality += 15;
+            gameState.indicators.soilHealth += 5;
+            gameState.indicators.biodiversity += 4;
+            gameState.indicators.resourceBalance += 6;
+
+            gameState.tech += 8;
+
+            addLog('💧 水资源管理成功！水质大幅改善，灌溉系统更加完善');
+            updateDisplay();
+        }
+
+        // 森林保护
+        function protectForest() {
+            if (gameState.money < 70) {
+                addLog('❌ 资金不足，无法进行森林保护');
+                return;
+            }
+
+            gameState.money -= 70;
+
+            gameState.indicators.airQuality += 12;
+            gameState.indicators.biodiversity += 8;
+            gameState.indicators.soilHealth += 6;
+            gameState.indicators.resourceBalance += 4;
+
+            gameState.tech += 6;
+
+            addLog('🌲 植树造林成功！空气质量显著提升，生态系统更加健康');
+            updateDisplay();
+        }
+
+        // 污染控制
+        function controlPollution() {
+            if (gameState.money < 100) {
+                addLog('❌ 资金不足，无法研发环保技术');
+                return;
+            }
+
+            gameState.money -= 100;
+
+            gameState.indicators.airQuality += 10;
+            gameState.indicators.waterQuality += 10;
+            gameState.indicators.soilHealth += 8;
+            gameState.indicators.resourceBalance += 7;
+
+            gameState.tech += 20;
+
+            addLog('♻️ 环保技术研发成功！全面改善了生态环境，科技水平提升');
+            updateDisplay();
+        }
+
+        // 进入下一季
+        function nextSeason() {
+            gameState.season++;
+
+            if (gameState.season >= 4) {
+                gameState.season = 0;
+                gameState.year++;
+                addLog(`🎊 第 ${gameState.year} 年开始了！`);
+            }
+
+            // 季节性自然变化
+            applySeasonEffects();
+
+            // 每季收入和支出
+            let income = Math.round(gameState.indicators.resourceBalance * 2);
+            gameState.money += income;
+
+            let foodConsumption = 15 + gameState.year * 2;
+            gameState.food -= foodConsumption;
+
+            // 自然衰减
+            for (let key in gameState.indicators) {
+                gameState.indicators[key] -= Math.random() * 5 + 2;
+            }
+
+            addLog(`⏭️ 进入${gameState.seasonNames[gameState.season]}，获得收入 ${income}💰，消耗粮食 ${foodConsumption}🌾`);
+            updateDisplay();
+        }
+
+        // 应用季节效果
+        function applySeasonEffects() {
+            switch(gameState.season) {
+                case 0: // 春季
+                    gameState.indicators.biodiversity += 5;
+                    gameState.indicators.soilHealth += 3;
+                    addLog('🌸 春季到来，万物复苏，生物多样性自然增加');
+                    break;
+                case 1: // 夏季
+                    gameState.indicators.waterQuality -= 5;
+                    gameState.indicators.airQuality += 2;
+                    addLog('☀️ 夏季炎热，水资源消耗增加，但光合作用旺盛');
+                    break;
+                case 2: // 秋季
+                    gameState.food += 30;
+                    gameState.indicators.resourceBalance += 5;
+                    addLog('🍂 秋季收获，获得额外粮食，资源更加平衡');
+                    break;
+                case 3: // 冬季
+                    gameState.indicators.biodiversity -= 5;
+                    gameState.money -= 30;
+                    addLog('❄️ 冬季寒冷，生物活动减少，维护成本增加');
+                    break;
+            }
+        }
+
+        // 检查游戏结束
+        function checkGameOver() {
+            let avgIndicator = 0;
+            let failCount = 0;
+
+            for (let key in gameState.indicators) {
+                avgIndicator += gameState.indicators[key];
+                if (gameState.indicators[key] <= 0) failCount++;
+            }
+            avgIndicator /= 5;
+
+            // 失败条件
+            if (failCount >= 2 || gameState.money < -500 || gameState.food < -100) {
+                endGame(false, avgIndicator);
+                return;
+            }
+
+            // 胜利条件 - 5年后评估
+            if (gameState.year >= 6) {
+                endGame(true, avgIndicator);
+                return;
+            }
+        }
+
+        // 游戏结束
+        function endGame(win, score) {
+            let gameOver = document.getElementById('gameOver');
+            let title = document.getElementById('gameOverTitle');
+            let scoreDisplay = document.getElementById('finalScore');
+            let message = document.getElementById('gameOverMessage');
+
+            gameOver.style.display = 'flex';
+
+            if (win) {
+                title.textContent = '🎉 恭喜！生态管理成功！';
+                scoreDisplay.textContent = '综合评分: ' + Math.round(score);
+
+                if (score >= 80) {
+                    message.textContent = '优秀！你是一位杰出的生态管理员，保护区生态系统欣欣向荣！';
+                } else if (score >= 60) {
+                    message.textContent = '良好！你成功维持了生态平衡，但仍有提升空间。';
+                } else {
+                    message.textContent = '及格！生态系统勉强维持，需要更多关注。';
+                }
+            } else {
+                title.textContent = '😢 生态系统崩溃！';
+                scoreDisplay.textContent = '最终评分: ' + Math.round(score);
+                message.textContent = '生态指标严重失衡，保护区管理失败。请重新尝试！';
+            }
+        }
+
+        // 重置游戏
+        function resetGame() {
+            gameState = {
+                year: 1,
+                season: 0,
+                money: 1000,
+                food: 100,
+                tech: 50,
+                indicators: {
+                    biodiversity: 50,
+                    waterQuality: 50,
+                    soilHealth: 50,
+                    airQuality: 50,
+                    resourceBalance: 50
+                },
+                seasonNames: ['春季', '夏季', '秋季', '冬季'],
+                seasonInfo: [
+                    '万物复苏，生机勃勃',
+                    '阳光充足，作物生长',
+                    '收获季节，硕果累累',
+                    '休养生息，储备资源'
+                ],
+                seasonIcons: ['🌸', '☀️', '🍂', '❄️']
+            };
+
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameLog').innerHTML = '';
+
+            initGame();
+        }
+
+        // 添加日志
+        function addLog(message) {
+            let logDiv = document.getElementById('gameLog');
+            let now = new Date();
+            let timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                          now.getMinutes().toString().padStart(2, '0') + ':' +
+                          now.getSeconds().toString().padStart(2, '0');
+
+            let entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${timeStr}]</span> ${message}`;
+
+            logDiv.insertBefore(entry, logDiv.firstChild);
+
+            // 限制日志数量
+            if (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.lastChild);
+            }
+        }
+
+        // 启动游戏
+        window.onload = initGame;
+    </script>
+</body>
+</html>
